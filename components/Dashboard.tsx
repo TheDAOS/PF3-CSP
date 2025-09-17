@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Responsive, WidthProvider, Layout } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -27,88 +27,204 @@ interface Widget {
   size: WidgetSize;
   content: (size: WidgetSize) => React.ReactNode;
   availableSizes: WidgetSize[];
+  gradient: string;
+  icon: React.ReactNode;
 }
 
-// Widget rendering functions
-const renderAnalyticsWidget = (size: WidgetSize) => {
-  if (size === 'medium') {
+// Apple Control Center style widgets
+const renderConnectivityWidget = (size: WidgetSize) => {
+  const [isWifiOn, setIsWifiOn] = useState(true);
+  const [isBluetoothOn, setIsBluetoothOn] = useState(false);
+  const [isAirplaneMode, setIsAirplaneMode] = useState(false);
+
+  if (size === 'small') {
     return (
-      <div className="p-3 flex-1 overflow-hidden">
-        <div className="grid grid-cols-2 gap-2 h-full">
-          <div className="bg-blue-50 rounded-xl p-3 flex flex-col justify-center items-center">
-            <div className="text-lg font-bold text-blue-600">1.2k</div>
-            <div className="text-xs text-gray-600">Users</div>
-          </div>
-          <div className="bg-green-50 rounded-xl p-3 flex flex-col justify-center items-center">
-            <div className="text-lg font-bold text-green-600">$12k</div>
-            <div className="text-xs text-gray-600">Revenue</div>
-          </div>
-        </div>
+      <div className="p-4 flex-1 overflow-hidden flex flex-col justify-center items-center">
+        <div className="text-3xl mb-2">📶</div>
+        <div className="text-xs text-white/80">WiFi</div>
+        <div className="text-xs text-white/60 mt-1">{isWifiOn ? 'Connected' : 'Off'}</div>
       </div>
     );
   }
-  
+
   return (
     <div className="p-4 flex-1 overflow-hidden">
       <div className="grid grid-cols-2 gap-3 h-full">
-        <div className="bg-blue-50 rounded-xl p-4 flex flex-col justify-center items-center min-h-0">
-          <div className="text-2xl font-bold text-blue-600 mb-1">1,234</div>
-          <div className="text-xs text-gray-600 text-center">Total Users</div>
-          <div className="text-xs text-green-600 mt-1">+12% ↗</div>
-        </div>
-        <div className="bg-green-50 rounded-xl p-4 flex flex-col justify-center items-center min-h-0">
-          <div className="text-2xl font-bold text-green-600 mb-1">98.5%</div>
-          <div className="text-xs text-gray-600 text-center">Uptime</div>
-          <div className="text-xs text-green-600 mt-1">+0.2% ↗</div>
-        </div>
-        <div className="bg-purple-50 rounded-xl p-4 flex flex-col justify-center items-center min-h-0">
-          <div className="text-2xl font-bold text-purple-600 mb-1">$12.5k</div>
-          <div className="text-xs text-gray-600 text-center">Revenue</div>
-          <div className="text-xs text-green-600 mt-1">+8% ↗</div>
-        </div>
-        <div className="bg-orange-50 rounded-xl p-4 flex flex-col justify-center items-center min-h-0">
-          <div className="text-2xl font-bold text-orange-600 mb-1">456</div>
-          <div className="text-xs text-gray-600 text-center">New Orders</div>
-          <div className="text-xs text-red-600 mt-1">-3% ↘</div>
-        </div>
+        <button 
+          onClick={() => setIsWifiOn(!isWifiOn)}
+          className={`glass-card rounded-2xl p-4 flex flex-col items-center justify-center apple-bounce transition-all ${
+            isWifiOn ? 'bg-blue-500/30' : 'bg-white/10'
+          }`}
+        >
+          <svg className="w-8 h-8 text-white mb-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.24 0 1 1 0 01-1.415-1.414 5 5 0 017.07 0 1 1 0 01-1.415 1.414zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
+          </svg>
+          <div className="text-xs text-white/80 font-medium">Wi-Fi</div>
+        </button>
+
+        <button 
+          onClick={() => setIsBluetoothOn(!isBluetoothOn)}
+          className={`glass-card rounded-2xl p-4 flex flex-col items-center justify-center apple-bounce transition-all ${
+            isBluetoothOn ? 'bg-blue-500/30' : 'bg-white/10'
+          }`}
+        >
+          <svg className="w-8 h-8 text-white mb-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 2a1 1 0 011 1v5.323l3.954-2.582a1 1 0 011.091 1.678L13.584 9l2.461 1.581a1 1 0 01-1.091 1.678L11 10.677V16a1 1 0 01-1.707.707L6.586 14H4a1 1 0 01-1-1v-2a1 1 0 011-1h2.586l2.707-2.707A1 1 0 0110 8V2z" clipRule="evenodd" />
+          </svg>
+          <div className="text-xs text-white/80 font-medium">Bluetooth</div>
+        </button>
+
+        <button 
+          onClick={() => setIsAirplaneMode(!isAirplaneMode)}
+          className={`glass-card rounded-2xl p-4 flex flex-col items-center justify-center apple-bounce transition-all ${
+            isAirplaneMode ? 'bg-orange-500/30' : 'bg-white/10'
+          }`}
+        >
+          <svg className="w-8 h-8 text-white mb-2" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+          </svg>
+          <div className="text-xs text-white/80 font-medium">Airplane</div>
+        </button>
+
+        <button className="glass-card rounded-2xl p-4 flex flex-col items-center justify-center apple-bounce bg-green-500/30">
+          <svg className="w-8 h-8 text-white mb-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+          </svg>
+          <div className="text-xs text-white/80 font-medium">Hotspot</div>
+        </button>
       </div>
     </div>
   );
 };
 
-const renderChartWidget = (size: WidgetSize) => {
-  if (size === 'medium') {
+const renderMediaWidget = (size: WidgetSize) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(75);
+
+  if (size === 'small') {
     return (
-      <div className="p-3 flex-1 overflow-hidden">
-        <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl h-full flex flex-col items-center justify-center text-white">
-          <div className="text-2xl mb-2">📊</div>
-          <div className="text-sm font-semibold">Performance</div>
-          <div className="text-xs opacity-75 mt-1">87% CPU</div>
-        </div>
+      <div className="p-4 flex-1 overflow-hidden flex flex-col justify-center items-center">
+        <button 
+          onClick={() => setIsPlaying(!isPlaying)}
+          className="apple-bounce"
+        >
+          <div className="text-3xl mb-2">{isPlaying ? '⏸️' : '▶️'}</div>
+        </button>
+        <div className="text-xs text-white/80">Music</div>
       </div>
     );
   }
-  
+
   return (
-    <div className="p-4 flex-1 overflow-hidden">
-      <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl h-full flex flex-col items-center justify-center text-white">
-        <div className="text-4xl mb-3">📊</div>
-        <div className="text-lg font-semibold mb-2">Performance Metrics</div>
-        <div className="text-sm opacity-90 text-center mb-4">Real-time analytics dashboard</div>
-        <div className="flex space-x-4 text-center">
-          <div>
-            <div className="text-xl font-bold">87%</div>
-            <div className="text-xs opacity-75">CPU</div>
-          </div>
-          <div>
-            <div className="text-xl font-bold">64%</div>
-            <div className="text-xs opacity-75">Memory</div>
-          </div>
-          <div>
-            <div className="text-xl font-bold">23ms</div>
-            <div className="text-xs opacity-75">Response</div>
-          </div>
+    <div className="p-4 flex-1 overflow-hidden flex flex-col">
+      <div className="flex items-center space-x-4 mb-4">
+        <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center">
+          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z" clipRule="evenodd" />
+          </svg>
         </div>
+        <div className="flex-1">
+          <div className="text-white font-medium text-sm">Now Playing</div>
+          <div className="text-white/70 text-xs">Midnight Dreams</div>
+          <div className="text-white/50 text-xs">Artist Name</div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-center space-x-6 mb-4">
+        <button className="apple-bounce">
+          <svg className="w-6 h-6 text-white/80" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"/>
+          </svg>
+        </button>
+
+        <button 
+          onClick={() => setIsPlaying(!isPlaying)}
+          className="glass-card w-12 h-12 rounded-full flex items-center justify-center apple-bounce"
+        >
+          {isPlaying ? (
+            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+          ) : (
+            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+            </svg>
+          )}
+        </button>
+
+        <button className="apple-bounce">
+          <svg className="w-6 h-6 text-white/80" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div className="flex items-center space-x-3">
+        <svg className="w-4 h-4 text-white/60" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM15.657 6.343a1 1 0 011.414 0A9.972 9.972 0 0119 12a9.972 9.972 0 01-1.929 5.657 1 1 0 11-1.414-1.414A7.971 7.971 0 0017 12c0-2.21-.896-4.21-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 12a5.984 5.984 0 01-.757 2.828 1 1 0 01-1.415-1.414A3.984 3.984 0 0013 12a3.983 3.983 0 00-.172-1.172 1 1 0 010-1.415z" clipRule="evenodd" />
+        </svg>
+        <div className="flex-1 h-1 bg-white/20 rounded-full">
+          <div className="h-full bg-white rounded-full" style={{ width: `${volume}%` }}></div>
+        </div>
+        <span className="text-xs text-white/60">{volume}%</span>
+      </div>
+    </div>
+  );
+};
+
+const renderSystemWidget = (size: WidgetSize) => {
+  const [brightness, setBrightness] = useState(80);
+  const [volume, setVolume] = useState(65);
+
+  if (size === 'small') {
+    return (
+      <div className="p-4 flex-1 overflow-hidden flex flex-col justify-center items-center">
+        <div className="text-3xl mb-2">🔆</div>
+        <div className="text-xs text-white/80">Brightness</div>
+        <div className="text-xs text-white/60 mt-1">{brightness}%</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 flex-1 overflow-hidden space-y-6">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <svg className="w-5 h-5 text-white/80" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+          </svg>
+          <span className="text-xs text-white/60">{brightness}%</span>
+        </div>
+        <div className="h-2 bg-white/20 rounded-full">
+          <div className="h-full bg-white rounded-full transition-all" style={{ width: `${brightness}%` }}></div>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <svg className="w-5 h-5 text-white/80" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM15.657 6.343a1 1 0 011.414 0A9.972 9.972 0 0119 12a9.972 9.972 0 01-1.929 5.657 1 1 0 11-1.414-1.414A7.971 7.971 0 0017 12c0-2.21-.896-4.21-2.343-5.657a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+          <span className="text-xs text-white/60">{volume}%</span>
+        </div>
+        <div className="h-2 bg-white/20 rounded-full">
+          <div className="h-full bg-white rounded-full transition-all" style={{ width: `${volume}%` }}></div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <button className="glass-card rounded-xl p-3 flex flex-col items-center apple-bounce">
+          <svg className="w-6 h-6 text-white mb-1" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+          </svg>
+          <div className="text-xs text-white/80">Settings</div>
+        </button>
+        <button className="glass-card rounded-xl p-3 flex flex-col items-center apple-bounce">
+          <svg className="w-6 h-6 text-white mb-1" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+          </svg>
+          <div className="text-xs text-white/80">Menu</div>
+        </button>
       </div>
     </div>
   );
@@ -117,187 +233,64 @@ const renderChartWidget = (size: WidgetSize) => {
 const renderStatsWidget = (size: WidgetSize) => {
   if (size === 'small') {
     return (
-      <div className="p-3 flex-1 overflow-hidden flex flex-col justify-center">
-        <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600">142</div>
-          <div className="text-xs text-gray-600 mt-1">Active Sessions</div>
-        </div>
+      <div className="p-4 flex-1 overflow-hidden flex flex-col justify-center items-center">
+        <div className="text-2xl font-bold text-white mb-1">87%</div>
+        <div className="text-xs text-white/80">CPU</div>
       </div>
     );
   }
 
-  if (size === 'medium') {
-    return (
-      <div className="p-3 flex-1 overflow-hidden">
-        <div className="space-y-2 h-full">
-          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
-            <span className="text-sm text-gray-700">Sessions</span>
-            <span className="font-bold text-green-600">142</span>
-          </div>
-          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
-            <span className="text-sm text-gray-700">Bounce Rate</span>
-            <span className="font-bold text-red-600">23.4%</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
   return (
     <div className="p-4 flex-1 overflow-hidden">
-      <div className="space-y-3 h-full">
-        <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-          <div className="flex items-center space-x-3">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm font-medium text-gray-700">Active Sessions</span>
+      <div className="grid grid-cols-2 gap-4 h-full">
+        <div className="flex flex-col justify-center items-center">
+          <div className="w-16 h-16 rounded-full border-4 border-white/20 flex items-center justify-center mb-2">
+            <div className="text-lg font-bold text-white">87%</div>
           </div>
-          <span className="font-bold text-green-600 text-lg">142</span>
+          <div className="text-xs text-white/80">CPU Usage</div>
         </div>
-        <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-          <div className="flex items-center space-x-3">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-sm font-medium text-gray-700">Bounce Rate</span>
+        <div className="flex flex-col justify-center items-center">
+          <div className="w-16 h-16 rounded-full border-4 border-white/20 flex items-center justify-center mb-2">
+            <div className="text-lg font-bold text-white">64%</div>
           </div>
-          <span className="font-bold text-red-600 text-lg">23.4%</span>
-        </div>
-        <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-          <div className="flex items-center space-x-3">
-            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-            <span className="text-sm font-medium text-gray-700">Conversion</span>
-          </div>
-          <span className="font-bold text-blue-600 text-lg">3.2%</span>
-        </div>
-        <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-          <div className="flex items-center space-x-3">
-            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-            <span className="text-sm font-medium text-gray-700">Page Views</span>
-          </div>
-          <span className="font-bold text-purple-600 text-lg">8,394</span>
+          <div className="text-xs text-white/80">Memory</div>
         </div>
       </div>
     </div>
   );
 };
 
-const renderTasksWidget = (size: WidgetSize) => {
-  if (size === 'medium') {
-    return (
-      <div className="p-3 flex-1 overflow-hidden flex flex-col">
-        <div className="space-y-2 flex-1">
-          <div className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-            <input type="checkbox" className="w-3 h-3 text-blue-600 rounded" />
-            <span className="text-sm flex-1">Update dashboard</span>
-          </div>
-          <div className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-            <input type="checkbox" checked className="w-3 h-3 text-blue-600 rounded" />
-            <span className="text-sm line-through text-gray-500 flex-1">Review feedback</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  return (
-    <div className="p-4 flex-1 overflow-hidden flex flex-col">
-      <div className="flex-1 space-y-3 overflow-y-auto">
-        <div className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-          <input type="checkbox" className="w-4 h-4 text-blue-600 rounded border-gray-300" />
-          <span className="text-sm flex-1">Update dashboard design</span>
-          <span className="text-xs text-red-500 bg-red-50 px-2 py-1 rounded-full">High</span>
-        </div>
-        <div className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-          <input type="checkbox" checked className="w-4 h-4 text-blue-600 rounded border-gray-300" />
-          <span className="text-sm line-through text-gray-500 flex-1">Review user feedback</span>
-          <span className="text-xs text-green-500 bg-green-50 px-2 py-1 rounded-full">Done</span>
-        </div>
-        <div className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-          <input type="checkbox" className="w-4 h-4 text-blue-600 rounded border-gray-300" />
-          <span className="text-sm flex-1">Deploy new features</span>
-          <span className="text-xs text-orange-500 bg-orange-50 px-2 py-1 rounded-full">Medium</span>
-        </div>
-        <div className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-          <input type="checkbox" className="w-4 h-4 text-blue-600 rounded border-gray-300" />
-          <span className="text-sm flex-1">Team meeting at 3 PM</span>
-          <span className="text-xs text-red-500 bg-red-50 px-2 py-1 rounded-full">Urgent</span>
-        </div>
-      </div>
-      <div className="mt-3 pt-3 border-t border-gray-200">
-        <button className="w-full text-left text-sm text-blue-600 hover:text-blue-800 font-medium">
-          + Add new task
-        </button>
-      </div>
-    </div>
-  );
-};
-
-const renderNotificationsWidget = (size: WidgetSize) => {
+const renderWeatherWidget = (size: WidgetSize) => {
   if (size === 'small') {
     return (
-      <div className="p-3 flex-1 overflow-hidden flex flex-col justify-center items-center">
-        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold mb-2">
-          3
-        </div>
-        <div className="text-xs text-gray-600 text-center">New notifications</div>
+      <div className="p-4 flex-1 overflow-hidden flex flex-col justify-center items-center">
+        <div className="text-3xl mb-2">☀️</div>
+        <div className="text-lg font-bold text-white">72°</div>
+        <div className="text-xs text-white/80">Sunny</div>
       </div>
     );
   }
 
-  if (size === 'medium') {
-    return (
-      <div className="p-3 flex-1 overflow-hidden">
-        <div className="space-y-2">
-          <div className="flex items-start space-x-2 p-2 bg-blue-50 rounded-lg">
-            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-              U
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-gray-900">New user</div>
-              <div className="text-xs text-blue-600">2 min ago</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
   return (
-    <div className="p-4 flex-1 overflow-hidden flex flex-col">
-      <div className="flex-1 space-y-3 overflow-y-auto">
-        <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-xl">
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-            U
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-gray-900">New user registered</div>
-            <div className="text-xs text-gray-500 mt-1">John Doe joined the platform</div>
-            <div className="text-xs text-blue-600 mt-1">2 minutes ago</div>
-          </div>
+    <div className="p-4 flex-1 overflow-hidden">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <div className="text-2xl font-bold text-white">72°F</div>
+          <div className="text-white/80 text-sm">San Francisco</div>
+          <div className="text-white/60 text-xs">Sunny</div>
         </div>
-        <div className="flex items-start space-x-3 p-3 bg-green-50 rounded-xl">
-          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-            $
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-gray-900">Payment received</div>
-            <div className="text-xs text-gray-500 mt-1">$250.00 from Premium subscription</div>
-            <div className="text-xs text-green-600 mt-1">5 minutes ago</div>
-          </div>
-        </div>
-        <div className="flex items-start space-x-3 p-3 bg-yellow-50 rounded-xl">
-          <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-            ⚠
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-gray-900">System maintenance</div>
-            <div className="text-xs text-gray-500 mt-1">Scheduled maintenance completed</div>
-            <div className="text-xs text-yellow-600 mt-1">1 hour ago</div>
-          </div>
-        </div>
+        <div className="text-5xl">☀️</div>
       </div>
-      <div className="mt-3 pt-3 border-t border-gray-200">
-        <button className="w-full text-left text-sm text-gray-600 hover:text-gray-800">
-          View all notifications →
-        </button>
+      
+      <div className="space-y-2">
+        <div className="flex justify-between text-xs">
+          <span className="text-white/80">High: 78°F</span>
+          <span className="text-white/80">Low: 65°F</span>
+        </div>
+        <div className="flex justify-between text-xs">
+          <span className="text-white/60">Humidity: 45%</span>
+          <span className="text-white/60">Wind: 12 mph</span>
+        </div>
       </div>
     </div>
   );
@@ -306,39 +299,49 @@ const renderNotificationsWidget = (size: WidgetSize) => {
 const Dashboard = () => {
   const [widgets, setWidgets] = useState<Widget[]>([
     {
-      id: 'analytics',
-      title: 'Analytics',
+      id: 'connectivity',
+      title: 'Connectivity',
       size: 'large',
-      availableSizes: ['medium', 'large'],
-      content: renderAnalyticsWidget,
+      availableSizes: ['small', 'medium', 'large'],
+      content: renderConnectivityWidget,
+      gradient: 'gradient-bg',
+      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414z" clipRule="evenodd" /></svg>,
     },
     {
-      id: 'chart',
-      title: 'Performance',
+      id: 'media',
+      title: 'Music',
       size: 'large',
-      availableSizes: ['medium', 'large'],
-      content: renderChartWidget,
+      availableSizes: ['small', 'medium', 'large'],
+      content: renderMediaWidget,
+      gradient: 'gradient-bg-2',
+      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z" clipRule="evenodd" /></svg>,
+    },
+    {
+      id: 'system',
+      title: 'System',
+      size: 'large',
+      availableSizes: ['small', 'medium', 'large'],
+      content: renderSystemWidget,
+      gradient: 'gradient-bg-3',
+      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg>,
     },
     {
       id: 'stats',
-      title: 'Quick Stats',
+      title: 'Performance',
       size: 'medium',
       availableSizes: ['small', 'medium', 'large'],
       content: renderStatsWidget,
+      gradient: 'gradient-bg-4',
+      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/></svg>,
     },
     {
-      id: 'tasks',
-      title: 'Tasks',
-      size: 'large',
-      availableSizes: ['medium', 'large'],
-      content: renderTasksWidget,
-    },
-    {
-      id: 'notifications',
-      title: 'Activity',
-      size: 'large',
+      id: 'weather',
+      title: 'Weather',
+      size: 'medium',
       availableSizes: ['small', 'medium', 'large'],
-      content: renderNotificationsWidget,
+      content: renderWeatherWidget,
+      gradient: 'gradient-bg-5',
+      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414z" clipRule="evenodd" /></svg>,
     },
   ]);
 
@@ -363,7 +366,7 @@ const Dashboard = () => {
         y,
         w: sizeConfig.w,
         h: sizeConfig.h,
-        isResizable: false, // Disable free resizing
+        isResizable: false,
       });
 
       x += sizeConfig.w;
@@ -385,55 +388,26 @@ const Dashboard = () => {
       widget.id === widgetId ? { ...widget, size: newSize } : widget
     );
     setWidgets(updatedWidgets);
-    
-    // Regenerate layout with new widget sizes
-    const newLayout = generateLayout();
-    setLayouts({ lg: newLayout });
-  };
-
-  const addWidget = () => {
-    const newWidget: Widget = {
-      id: `widget-${Date.now()}`,
-      title: 'New Widget',
-      size: 'medium',
-      availableSizes: ['small', 'medium', 'large'],
-      content: (size: WidgetSize) => (
-        <div className="p-4 h-full flex items-center justify-center">
-          <div className="text-center text-gray-500">
-            <div className="text-2xl mb-2">📦</div>
-            <div className="text-sm">New Widget</div>
-            <div className="text-xs mt-1 opacity-75">Size: {size}</div>
-          </div>
-        </div>
-      ),
-    };
-
-    const updatedWidgets = [...widgets, newWidget];
-    setWidgets(updatedWidgets);
   };
 
   // Update layout when widgets change
-  React.useEffect(() => {
+  useEffect(() => {
     const newLayout = generateLayout();
     setLayouts({ lg: newLayout });
   }, [widgets]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen main-background">
+      {/* Floating Particles */}
+      <div className="particle" style={{ top: '20%' }}></div>
+      <div className="particle" style={{ top: '60%' }}></div>
+      <div className="particle" style={{ top: '80%' }}></div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Dashboard Header */}
-        <div className="mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600 mt-1">Drag widgets and use size controls to customize your view</p>
-          </div>
-          <button
-            onClick={addWidget}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium transition-colors flex items-center space-x-2"
-          >
-            <span>+</span>
-            <span>Add Widget</span>
-          </button>
+        <div className="mb-8 text-center">
+          <h1 className="text-5xl font-bold text-white mb-2 drop-shadow-lg">Control Center</h1>
+          <p className="text-white/80 text-lg drop-shadow-md">Drag and customize your controls</p>
         </div>
 
         {/* Grid Layout */}
@@ -443,42 +417,38 @@ const Dashboard = () => {
           onLayoutChange={handleLayoutChange}
           breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
           cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-          rowHeight={60}
+          rowHeight={80}
           isDraggable={true}
-          isResizable={false} // Disable free resizing
-          margin={[16, 16]}
+          isResizable={false}
+          margin={[20, 20]}
           containerPadding={[0, 0]}
           useCSSTransforms={true}
         >
           {widgets.map((widget) => (
             <div
               key={widget.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 flex flex-col h-full"
+              className={`glass-card-dark rounded-3xl apple-hover overflow-hidden ${widget.gradient}`}
             >
               {/* Widget Header */}
-              <div className="flex items-center justify-between p-3 border-b border-gray-100 flex-shrink-0">
-                <h3 className="font-semibold text-gray-900 text-sm">{widget.title}</h3>
+              <div className="flex items-center justify-between p-4 border-b border-white/10">
+                <div className="flex items-center space-x-2">
+                  {widget.icon}
+                  <h3 className="font-semibold text-white text-sm">{widget.title}</h3>
+                </div>
                 <div className="flex items-center space-x-1">
                   {/* Size Controls */}
-                  <div className="flex items-center space-x-1 mr-2">
-                    {widget.availableSizes.map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => changeWidgetSize(widget.id, size)}
-                        className={`w-4 h-4 rounded border-2 transition-colors ${
-                          widget.size === size
-                            ? 'bg-blue-500 border-blue-500'
-                            : 'border-gray-300 hover:border-blue-400'
-                        }`}
-                        title={WIDGET_SIZES[size].label}
-                      />
-                    ))}
-                  </div>
-                  <button className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100 transition-colors">
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                    </svg>
-                  </button>
+                  {widget.availableSizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => changeWidgetSize(widget.id, size)}
+                      className={`w-3 h-3 rounded-full border transition-all apple-bounce ${
+                        widget.size === size
+                          ? 'bg-white border-white'
+                          : 'border-white/40 hover:border-white/70'
+                      }`}
+                      title={WIDGET_SIZES[size].label}
+                    />
+                  ))}
                 </div>
               </div>
               
